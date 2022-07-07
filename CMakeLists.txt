@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 2.8.3)
+cmake_minimum_required(VERSION 3.3)
 project(VRPN)
 
 #-----------------------------------------------------------------------------
@@ -1146,6 +1146,7 @@ set(VRPN_SERVER_SOURCES
 	vrpn_Tracker_PDI.C
 	vrpn_Tracker_PhaseSpace.C
 	vrpn_Tracker_RazerHydra.C
+	vrpn_Tracker_ROStf.C
 	vrpn_Tracker_ThalmicLabsMyo.C
 	vrpn_Tracker_SpacePoint.C
 	vrpn_Tracker_Wintracker.C
@@ -1260,6 +1261,7 @@ set(VRPN_SERVER_PUBLIC_HEADERS
 	vrpn_Tracker_PDI.h
 	vrpn_Tracker_PhaseSpace.h
 	vrpn_Tracker_RazerHydra.h
+	vrpn_Tracker_ROStf.h
 	vrpn_Tracker_ThalmicLabsMyo.h
 	vrpn_Tracker_SpacePoint.h
 	vrpn_Tracker_Wintracker.h
@@ -1282,12 +1284,22 @@ set(VRPN_SERVER_PUBLIC_HEADERS
 
 set(VRPN_SERVER_LIBRARY)
 set(VRPN_CLIENT_LIBRARY)
+find_package(rclcpp REQUIRED)
+find_package(tf2 REQUIRED)
+find_package(tf2_ros REQUIRED)
+find_package(geometry_msgs REQUIRED)
+list(APPEND EXTRA_LIBS ${rclcpp_LIBRARIES})
 
 if(VRPN_BUILD_SERVER_LIBRARY)
 	add_library(vrpnserver
 		${VRPN_SERVER_SOURCES}
 		${VRPN_SERVER_PUBLIC_HEADERS})
 	target_link_libraries(vrpnserver ${EXTRA_LIBS} ${SERVER_EXTRA_LIBS})
+  ament_target_dependencies(vrpnserver rclcpp tf2 tf2_ros geometry_msgs)
+  ament_export_dependencies(rclcpp)
+  ament_export_dependencies(tf2)
+  ament_export_dependencies(tf2_ros)
+  ament_export_dependencies(geometry_msgs)
 	set(VRPN_CLIENT_LIBRARY vrpnserver)
 	set(VRPN_SERVER_LIBRARY vrpnserver)
 	set_property(TARGET
@@ -1335,10 +1347,17 @@ if(VRPN_BUILD_SERVER_LIBRARY)
 	add_cppcheck(vrpnserver STYLE UNUSED_FUNCTIONS)
 endif()
 
+find_package(ament_cmake REQUIRED)
+include_directories(${rclcpp_INCLUDE_DIRS})
 
 if(VRPN_BUILD_CLIENT_LIBRARY)
 	add_library(vrpn ${VRPN_CLIENT_SOURCES} ${VRPN_CLIENT_PUBLIC_HEADERS})
 	target_link_libraries(vrpn ${EXTRA_LIBS})
+  ament_target_dependencies(vrpn rclcpp tf2 tf2_ros geometry_msgs)
+  ament_export_dependencies(rclcpp)
+  ament_export_dependencies(tf2)
+  ament_export_dependencies(tf2_ros)
+  ament_export_dependencies(geometry_msgs)
 	set(VRPN_CLIENT_LIBRARY vrpn)
 
 	set_property(TARGET

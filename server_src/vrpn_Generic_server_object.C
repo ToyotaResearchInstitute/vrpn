@@ -95,6 +95,7 @@
 #include "vrpn_Tracker_PDI.h"
 #include "vrpn_Tracker_PhaseSpace.h"
 #include "vrpn_Tracker_RazerHydra.h"      // for vrpn_Tracker_RazerHydra
+#include "vrpn_Tracker_ROStf.h"           // for vrpn_Tracker_ROStf
 #include "vrpn_Tracker_Filter.h"          // for vrpn_Tracker_FilterOneEuro
 #include "vrpn_Tracker_SpacePoint.h"      // for vrpn_Tracker_SpacePoint
 #include "vrpn_Tracker_ThalmicLabsMyo.h"  // for vrpn_Tracker_ThalmicLabsMyo
@@ -2046,6 +2047,29 @@ int vrpn_Generic_Server_Object::setup_Tracker_NULL(char *&pch, char *line,
     _devices->add(new vrpn_Tracker_NULL(s2, connection, i1, f1));
 
     return 0;
+}
+
+int vrpn_Generic_Server_Object::setup_Tracker_ROStf(char *&pch, char *line,
+  FILE * /*config_file*/)
+{
+
+  char trackerName[LINESIZE];
+  char fromFrameRel[LINESIZE];
+  char toFrameRel[LINESIZE];
+
+  VRPN_CONFIG_NEXT();
+  // Get the arguments (class, tracker_name, sensors, rate)
+  if (sscanf(pch, "%511s%511s%511s", trackerName, fromFrameRel, toFrameRel) != 3) {
+    fprintf(stderr, "Bad vrpn_Tracker_ROStf line: %s\n", line);
+    return -1;
+  }
+
+  // Open the tracker
+  if (verbose)
+    printf("Opening vrpn_Tracker_ROStf: %s. Listening for transform from [\"%s\"] to [\"%s\"]\n", trackerName, fromFrameRel, toFrameRel);
+  _devices->add(new vrpn_Tracker_ROStf(trackerName, connection, fromFrameRel, toFrameRel));
+
+  return 0;
 }
 
 int vrpn_Generic_Server_Object::setup_Tracker_Spin(char *&pch, char *line,
@@ -5711,6 +5735,9 @@ vrpn_Generic_Server_Object::vrpn_Generic_Server_Object(
                 }
                 else if (VRPN_ISIT("vrpn_Tracker_RazerHydra")) {
                     VRPN_CHECK(setup_Tracker_RazerHydra);
+                }
+                else if (VRPN_ISIT("vrpn_Tracker_ROStf")) {
+                    VRPN_CHECK(setup_Tracker_ROStf);
                 }
                 else if (VRPN_ISIT ("vrpn_Tracker_ThalmicLabsMyo")) {
                     VRPN_CHECK(setup_Tracker_ThalmicLabsMyo);

@@ -81,6 +81,7 @@ protected:
                                      FILE * /*config_file*/);
     int setup_Tracker_NULL(char *&pch, char *line, FILE * /*config_file*/);
     int setup_Tracker_Spin(char *&pch, char *line, FILE * /*config_file*/);
+    int setup_Tracker_ROStf(char *&pch, char *line, FILE * /*config_file*/);
     int setup_Button_Python(char *&pch, char *line, FILE * /*config_file*/);
     int setup_Button_SerialMouse(char *&pch, char *line,
                                  FILE * /*config_file*/);
