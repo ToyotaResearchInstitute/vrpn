@@ -19,7 +19,12 @@ if(VRPN_BUILD_CLIENTS)
 
 	#-----------------------------------------------------------------------------
 	# Libraries we need to do our thing.
-	find_package(GLUT)
+    find_package(GLUT)
+	find_package(FreeGLUT)
+
+    if (FreeGLUT_FOUND)
+        set(GLUT_LIBRARIES FreeGLUT::freeglut)
+    endif()
 	if(APPLE)
 		mark_as_advanced(GLUT_cocoa_LIBRARY)
 	endif()
@@ -83,7 +88,7 @@ if(VRPN_BUILD_CLIENTS)
 
     add_test(test_imager test_imager)
 
-		if(GLUT_FOUND AND OPENGL_FOUND)
+    if((FreeGLUT_FOUND OR GLUT_FOUND) AND OPENGL_FOUND)
 
 			option(VRPN_GLUT_IS_STATIC_FREEGLUT
 				"Is the GLUT used a static build of FreeGLUT?"
